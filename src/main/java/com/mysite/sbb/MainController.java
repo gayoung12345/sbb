@@ -14,8 +14,9 @@ public class MainController {
         return "index";
     }
 
+    // http://localhost:8080/ 접속 하면,
     @GetMapping("/")
     public String root(){
-        return "redirect:/question/list";
+        return "redirect:/question/list"; // 바로 http://localhost:8080/question/list로 redirect 하도록 설정
     }
 }
