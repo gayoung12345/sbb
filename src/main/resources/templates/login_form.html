@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" layout:decorate="~{layout}" xmlns:th="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>로그인</title>
+</head>
+<body>
+<div layout:fragment="content" class="container my-3">
+    <!-- 로그인 폼 -->
+    <form th:action="@{/user/login}" method="post">
+        <!-- 로그인 에러 발생 -->
+        <div th:if="${param.error}">
+            <div class="alert alert-danger">
+                사용자ID 또는 비밀번호를 확인해 주세요.
+            </div>
+        </div>
+        <!-- ID -->
+        <div class="mb-3">
+            <label for="username" class="form-label">사용자ID</label>  <!-- for 속성: label과 결합될 요소 명시 -->
+            <input type="text" name="username" id="username" class="form-control">
+        </div>
+        <!-- password -->
+        <div class="mb-3">
+            <label for="password" class="form-label">비밀번호</label>
+            <input type="password" name="password" id="password" class="form-control">
+        </div>
+        <!-- 로그인 btn -->
+        <button type="submit" class="btn btn-primary">로그인</button>
+    </form>
+</div>
+</body>
+</html>
