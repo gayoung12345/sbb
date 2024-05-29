@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity // @Entity: DB 테이블에 대응하는 하나의 클래스. JPA가 관리해주며, JPA를 사용해서 DB 테이블과 매핑할 수 있는 클래스 임을 알려주는 Annotation
@@ -34,4 +36,7 @@ public class Answer { // DTO(Data Transfer Object) : 클라이언트와 서버�
     // 수정일
     private LocalDateTime modifyDate;
 
+    // 추천수
+    @ManyToMany
+    Set<SiteUser> voter;
 }

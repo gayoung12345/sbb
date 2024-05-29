@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Setter
 @Getter
@@ -37,4 +38,7 @@ public class Question { // DTO(Data Transfer Object) : 클라이언트와 서버
     // 수정일
     private LocalDateTime modifyDate;
 
+    // 추천수
+    @ManyToMany
+    Set<SiteUser> voter;
 }

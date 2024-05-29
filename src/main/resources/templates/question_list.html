@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en" layout:decorate="~{layout}" xmlns:th="http://www.w3.org/1999/xhtml" xmlns:layout="http://www.w3.org/1999/xhtml">
+<html lang="en" layout:decorate="~{layout}" xmlns:th="http://www.w3.org/1999/xhtml"
+      xmlns:layout="http://www.w3.org/1999/xhtml">
 <head>
     <meta charset="UTF-8">
     <title>질문 목록 보기</title>
@@ -9,6 +10,20 @@
 </head>
 <body>
 <div layout:fragment="content" class="container my-3">
+    <div class="row my-3">
+        <!-- 질문 등록 btn -->
+        <div class="col-6">
+            <a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a>
+        </div>
+        <!-- 검색창 -->
+        <div class="col-6">
+            <div class="input-group">
+                <input type="text" id="search_kw" class="form-control" th:value="${kw}">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+    <!-- 질문리스트 -->
     <table class="table">
         <!-- 표(list) 머릿글 -->
         <thead class="table-dark">
@@ -24,7 +39,7 @@
         <tr class="text-center" th:each="question, loop : ${paging}"> <!-- 반복 -->
             <!-- 글 번호 -->
             <td th:text="${paging.getTotalElements - (paging.number * paging.size) - loop.index}"></td>
-                <!-- 게시물 번호 = 전체 게시물 수 - (현재 페이지 * 페이지당 게시물 개수 ) - 나열 인덱스 -->
+            <!-- 게시물 번호 = 전체 게시물 수 - (현재 페이지 * 페이지당 게시물 개수 ) - 나열 인덱스 -->
             <!-- 글 제목 -->
             <td class="text_start">
                 <a th:href="@{|/question/detail/${question.id}|}"
@@ -48,9 +63,10 @@
     <div th:if="${!paging.isEmpty()}">
         <ul class="pagination justify-content-center">
             <!-- 이전 btn -->
-            <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'"> <!-- 만약 이전 페이지가 없으면 비활성화(disabled)-->
+            <li class="page-item" th:classappend="${!paging.hasPrevious} ? 'disabled'">
+                <!-- 만약 이전 페이지가 없으면 비활성화(disabled)-->
                 <a class="page-link"
-                   th:href="@{|?page=${paging.number-1}|}">
+                   href="javascript:void(0)" th:data-page="${paging.number-1}">
                     <span>이전</span>
                 </a>
             </li>
@@ -61,20 +77,41 @@
                 class="page-item">
                 <!-- th:classappend = "조건식?클래스_값" : 조건식이 참이면 클래스_값을 class 속성에 추가 -->
                 <!-- 반복 구간 내에서 해당 페이지가 현재 페이지와 같으면 active 클래스 적용 -->
-                <a th:text="${page}" class="page-link" th:href="@{|?page=${page}|}"></a>
+                <a th:text="${page}" class="page-link" href="javascript:void(0)" th:data-page="${page}"></a>
                 <!-- 페이지로 이동 url -->
             </li>
             <!-- 이후 btn -->
-            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'"> <!-- 만약 다음 페이지가 없으면 비활성화(disabled)-->
-                <a class="page-link" th:href="@{|?page=${paging.number+1}|}">
+            <li class="page-item" th:classappend="${!paging.hasNext} ? 'disabled'">
+                <!-- 만약 다음 페이지가 없으면 비활성화(disabled)-->
+                <a class="page-link" href="javascript:void(0)" th:data-page="${paging.number+1}">
                     <span>다음</span>
                 </a>
             </li>
         </ul>
     </div>
     <!-- 페이징처리 끝 -->
-    <!-- 질문등록 폼 btn -->
-    <a th:href="@{/question/create}" class="btn btn-primary">질문 등록하기</a>
+    <!-- 검색 폼 -->
+    <form th:action="@{/question/list}" method="get" id="searchForm">
+        <input type="hidden" id="kw" name="kw" th:value="${kw}">
+        <input type="hidden" id="page" name="page" th:value="${paging.number}">
+    </form>
 </div>
+<!-- java script -->
+<!-- page, kw 매개변수를 동시에 요청 할 수 있도록 함 -->
+<script layout:fragment="script" type='text/javascript'>
+    const page_elements = document.getElementsByClassName("page-link");
+    Array.from(page_elements).forEach(function(element) {
+        element.addEventListener('click', function() {
+            document.getElementById('page').value = this.dataset.page;
+            document.getElementById('searchForm').submit();
+        });
+    });
+    const btn_search = document.getElementById("btn_search");
+    btn_search.addEventListener('click', function() {
+        document.getElementById('kw').value = document.getElementById('search_kw').value;
+        document.getElementById('page').value = 0;  // 검색버튼을 클릭할 경우 0페이지부터 조회한다.
+        document.getElementById('searchForm').submit();
+    });
+</script>
 </body>
 </html>

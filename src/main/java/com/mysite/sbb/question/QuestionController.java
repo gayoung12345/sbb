@@ -29,9 +29,10 @@ public class QuestionController {
 
     // 질문 전체 리스트
     @GetMapping("/list")
-    public String list(Model model, @RequestParam(value="page", defaultValue="0") int page) {
-        Page<Question> paging = this.questionService.getList(page);
+    public String list(Model model, @RequestParam(value="page", defaultValue="0") int page, @RequestParam(value = "kw", defaultValue = "") String kw) {
+        Page<Question> paging = this.questionService.getList(page, kw);
         model.addAttribute("paging", paging);
+        model.addAttribute("kw", kw);
         return "question_list"; // 질문 전체 리스트 html 가져옴
     }
 
@@ -51,7 +52,8 @@ public class QuestionController {
     }
 
     // 질문 작성 완료(post)
-    @PreAuthorize("isAuthenticated()")  // 로그인이 필요한 메소드
+    // @PreAuthorize("isAuthenticated()")  // 로그인이 필요한 메소드
+    @PreAuthorize("hasRole('ROLE_ADMIN')") // 'ROLE_ADMIN'권한이 있는 사용자만 글 작성 가능
     @PostMapping("/create")
     public String questionCreate(@Valid QuestionForm questionForm, BindingResult bindingResult, Principal principal){
         if (bindingResult.hasErrors()) { // 오류 발생
@@ -101,6 +103,16 @@ public class QuestionController {
         }
         this.questionService.delete(question); // 질문 삭제
         return "redirect:/"; // 질문 삭제를 완료하면 default 페이지로 돌아감
+    }
+
+    // 질문 추천
+    @PreAuthorize("isAuthenticated()") // 로그인이 필요한 메소드
+    @GetMapping("/vote/{id}")
+    public String questionVote(Principal principal, @PathVariable("id") Integer id) {
+        Question question = this.questionService.getQuestion(id);
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        this.questionService.vote(question, siteUser);
+        return String.format("redirect:/question/detail/%s", id);
     }
 
 }

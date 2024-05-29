@@ -35,8 +35,8 @@ public class AnswerController {
             model.addAttribute("question", question);
             return "question_detail";   // 이전에 작성하던 페이지를 유지함
         }
-        this.answerService.create(question, answerForm.getContent(), siteUser);
-        return String.format("redirect:/question/detail/%s", id); // 답변 작성을 완료하면 질문 상세 페이지로 돌아감
+        Answer answer = this.answerService.create(question, answerForm.getContent(), siteUser);
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(),answer.getId()); // 답변 작성을 완료하면 질문 상세 페이지로 돌아감
     }
 
     // 답변 수정
@@ -64,7 +64,7 @@ public class AnswerController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "수정권한이 없습니다."); // 에러 메세지 출력
         }
         this.answerService.modify(answer, answerForm.getContent()); // 수정
-        return String.format("redirect:/question/detail/%s", answer.getQuestion().getId()); // 수정 완료 후 원래 있던 질문 상세 페이지로 돌아감
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(), answer.getId()); // 수정 완료 후 원래 있던 질문 상세 페이지로 돌아감
     }
 
     // 답변 삭제
@@ -78,4 +78,15 @@ public class AnswerController {
         this.answerService.delete(answer);
         return String.format("redirect:/question/detail/%s", answer.getQuestion().getId()); // 삭제 완료 후 원래 있던 질문 상세 페이지로 돌아감
     }
+
+    // 답변 추천
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/vote/{id}")
+    public String answerVote(Principal principal, @PathVariable("id") Integer id) {
+        Answer answer = this.answerService.getAnswer(id);
+        SiteUser siteUser = this.userService.getUser(principal.getName());
+        this.answerService.vote(answer, siteUser);
+        return String.format("redirect:/question/detail/%s#answer_%s", answer.getQuestion().getId(),answer.getId());
+    }
+
 }
